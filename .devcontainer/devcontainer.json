@@ -1,0 +1,42 @@
+{
+	"name": "LLM-Playground",
+	"image": "mcr.microsoft.com/devcontainers/dotnet:1-10.0-preview",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/powershell:1": {},
+		"ghcr.io/dotnet/aspire-devcontainer-feature/dotnetaspire:1": {},
+	},
+
+	"hostRequirements": {
+		"cpus": 8,
+		"memory": "32gb",
+		"storage": "64gb"
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [5000, 5001],
+	// "portsAttributes": {
+	//		"5001": {
+	//			"protocol": "https"
+	//		}
+	// }
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "dotnet restore",
+	"onCreateCommand": "curl -sSL https://aspire.dev/install.sh | bash",
+	"postStartCommand": "dotnet dev-certs https --trust",
+	
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-dotnettools.csdevkit",
+				"ms-mssql.mssql",
+				"zxh404.vscode-proto3",
+				"jeremycaron.csharp-organize-usings"
+			]
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	//"remoteUser": "root"
+}

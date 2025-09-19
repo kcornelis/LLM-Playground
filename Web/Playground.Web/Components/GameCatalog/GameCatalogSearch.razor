@@ -1,0 +1,65 @@
+﻿@page "/gamecatalog/search"
+@rendermode InteractiveServer
+
+@inject GameCatalogClient GameCatalogClient
+
+<PageTitle>Game Catalog</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">LLM Text Embedding Search</MudText>
+<MudText Class="mb-8">
+    Ever wondered how an AI finds the difference between "cat videos" and "quantum physics"? <br />
+    Welcome to a text embedding search playground, where your words are magically transformed into numbers, <br />
+    and those numbers help you find what you never knew you needed. It's like Google, but with more existential dread.
+</MudText>
+
+<MudText Typo="Typo.h4" GutterBottom="true">Inspiration:</MudText>
+<MudText Class="mb-8 pl-8">
+<ul>
+    <li>recent puzzle games</li>
+    <li>co-op platformers released after 2020</li>
+    <li>games with time travel mechanics</li>
+    <li>highly rated singleplayer adventures</li>
+    <li>cheap multiplayer shooters</li>
+    <li>fantasy RPGs available on Steam Deck</li>
+    <li>story rich indie games</li>
+    <li>games with positive reviews and controller support</li>
+    <li>classic action games for Linux</li>
+    <li>new releases with great soundtracks</li>
+</ul>
+</MudText>
+
+<MudGrid>
+    <MudItem xs="6">
+        <div class="d-flex align-center justify-start flex-grow-1 gap-4">
+            <MudTextField @bind-Value="searchQuery" Label="Search games..." Variant="Variant.Outlined"></MudTextField>
+            <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" OnClick="@((e) => SearchGames())" />
+        </div>
+    </MudItem>
+</MudGrid>
+
+
+@if (games.Any())
+{
+    <MudTable Items="@games" Hover="true" Breakpoint="Breakpoint.Sm" Class="mt-8">
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Title</MudTh>
+            <MudTh>Description</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="Title">@context.Title</MudTd>
+            <MudTd DataLabel="Description">@context.Description</MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    private string searchQuery = string.Empty;
+    private IEnumerable<Game> games = Array.Empty<Game>();
+
+    private async Task SearchGames()
+    {
+        games = (await GameCatalogClient.SearchAsync(searchQuery)).ToList();
+    }
+}

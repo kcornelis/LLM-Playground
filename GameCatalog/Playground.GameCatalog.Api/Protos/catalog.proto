@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option csharp_namespace = "Playground.GameCatalog.Api";
+
+package GameCatalogApi;
+
+service Catalog {
+  rpc Search (SearchRequest) returns (SearchResponse);
+}
+
+message Game {
+  int32 Id = 1;
+  string Title = 2;
+  string Description = 3;
+}
+
+message SearchRequest {
+  string Query = 1;
+}
+
+message SearchResponse {
+  repeated Game items = 1;
+}

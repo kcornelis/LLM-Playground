@@ -1,0 +1,52 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.0.0
+MinimumVisualStudioVersion = 17.8.0.0
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground.AppHost", "Shared\Playground.AppHost\Playground.AppHost.csproj", "{B5382D4D-C91B-4D7A-AE95-6019B7EC3530}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground.ServiceDefaults", "Shared\Playground.ServiceDefaults\Playground.ServiceDefaults.csproj", "{6E4D8AFB-AB26-4C57-889D-0DE8791AD3A9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground.GameCatalog.Api", "GameCatalog\Playground.GameCatalog.Api\Playground.GameCatalog.Api.csproj", "{68C037C3-CB39-43A0-8B1B-9D693E1021DD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground.GameCatalog.Models", "GameCatalog\Playground.GameCatalog.Models\Playground.GameCatalog.Models.csproj", "{70C037C3-CB40-43A0-8B1B-9D693E1021AA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground.GameCatalog.Migrations", "GameCatalog\Playground.GameCatalog.Migrations\Playground.GameCatalog.Migrations.csproj", "{70C03333-CB40-43A0-8B1B-9D693E102DDD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground.Tests", "Web\Playground.Tests\Playground.Tests.csproj", "{12A6B4D7-0097-4C6B-830D-903CC7EACE87}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground.Web", "Web\Playground.Web\Playground.Web.csproj", "{FA2E640F-B9D5-4E81-8F79-D22FAF4257DD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B5382D4D-C91B-4D7A-AE95-6019B7EC3530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5382D4D-C91B-4D7A-AE95-6019B7EC3530}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5382D4D-C91B-4D7A-AE95-6019B7EC3530}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5382D4D-C91B-4D7A-AE95-6019B7EC3530}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E4D8AFB-AB26-4C57-889D-0DE8791AD3A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E4D8AFB-AB26-4C57-889D-0DE8791AD3A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E4D8AFB-AB26-4C57-889D-0DE8791AD3A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E4D8AFB-AB26-4C57-889D-0DE8791AD3A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68C037C3-CB39-43A0-8B1B-9D693E1021DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68C037C3-CB39-43A0-8B1B-9D693E1021DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68C037C3-CB39-43A0-8B1B-9D693E1021DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68C037C3-CB39-43A0-8B1B-9D693E1021DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12A6B4D7-0097-4C6B-830D-903CC7EACE87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12A6B4D7-0097-4C6B-830D-903CC7EACE87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12A6B4D7-0097-4C6B-830D-903CC7EACE87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12A6B4D7-0097-4C6B-830D-903CC7EACE87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA2E640F-B9D5-4E81-8F79-D22FAF4257DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA2E640F-B9D5-4E81-8F79-D22FAF4257DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA2E640F-B9D5-4E81-8F79-D22FAF4257DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA2E640F-B9D5-4E81-8F79-D22FAF4257DD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {641293EB-47AD-4F21-AC93-9C2C4D054553}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.4.2" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>bb36b059-af37-4699-a101-1de8c2295112</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\GameCatalog\Playground.GameCatalog.Api\Playground.GameCatalog.Api.csproj" />
+    <ProjectReference Include="..\..\GameCatalog\Playground.GameCatalog.Migrations\Playground.GameCatalog.Migrations.csproj" />
+    <ProjectReference Include="..\..\Web\Playground.Web\Playground.Web.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.4.2" />
+    <PackageReference Include="Aspire.Hosting.SqlServer" Version="9.4.2" />
+  </ItemGroup>
+
+</Project>
