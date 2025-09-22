@@ -1,3 +1,4 @@
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Polly.Timeout;
 
@@ -19,6 +20,15 @@ public class GameCatalogClient(Catalog.CatalogClient client)
             (ex.StatusCode is StatusCode.Internal && ex.Status.DebugException is TimeoutRejectedException))
         {
             return [];
+        }
+    }
+
+    public async IAsyncEnumerable<GenerateEmbeddingsResponse> GenerateEmbeddingsStreamAsync([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        using var call = client.GenerateEmbeddings(new Empty(), cancellationToken: cancellationToken);
+        await foreach (var message in call.ResponseStream.ReadAllAsync(cancellationToken))
+        {
+            yield return message;
         }
     }
 }

@@ -19,7 +19,7 @@ counter=0
 while read -r item; do
     app_id=$(echo "$item" | jq '.app_id')
     description=$(echo "$item" | jq -r '.description' | tr -cd 'a-zA-Z0-9 ')
-    tags=$(echo "$item" | jq -c '.tags' | tr -cd 'a-zA-Z0-9 ')
+    tags=$(echo "$item" | jq -c '.tags' | sed "s/'/''/g")
 
     echo "UPDATE Games SET Description = N'$description', Tags = '$tags' WHERE Id = $app_id;" >> "$output_sql"
 

@@ -1,0 +1,58 @@
+@inject Playground.Web.Services.GameCatalogClient CatalogClient
+
+<MudDialog>
+    <DialogContent>
+        <MudText Class="mt-2">
+        @(IsCompleted ? (MarkupString)"Generation completed successfully! Click ok to close the dialog." :
+          IsRunning ? (MarkupString)"Generation in progress... Please wait." : 
+          (MarkupString)"Generates embeddings for the catalog — costs a few OpenAI credits. <br />Click ok if you dare (and have credits).")
+        </MudText>
+        <MudProgressLinear Class="@(IsRunning || IsCompleted ? "mt-4 visible" : "mt-4 invisible")" Color="Color.Primary" Value="@ProgressPercent" />
+        <MudText Class="@(IsRunning || IsCompleted ? "mt-2 visible" : "mt-2 invisible")">Processed @Processed / @Total</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Secondary" Disabled="@(IsRunning || IsCompleted)" OnClick="CloseDialog">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Disabled="@IsRunning" OnClick="StartOrCloseDialog">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = default!;
+
+    private bool IsRunning { get; set; }
+    private bool IsCompleted => !IsRunning && Total > 0;
+
+    private int Processed { get; set; }
+    private int Total { get; set; }
+    private double ProgressPercent => Total > 0 ? (double)Processed / Total * 100 : 0;
+
+    private async Task StartOrCloseDialog()
+    {
+        IsRunning = true;
+        try
+        {
+            await foreach (var update in CatalogClient.GenerateEmbeddingsStreamAsync())
+            {
+                Total = update.Total;
+                Processed = update.Processed;
+                StateHasChanged();
+            }
+            Dialog.Close(DialogResult.Ok(true));
+        }
+        catch
+        {
+            // Optionally show an error; for now we just close with cancel result
+            Dialog.Cancel();
+        }
+        finally
+        {
+            IsRunning = false;
+        }
+    }
+
+    private void CloseDialog()
+    {
+        Dialog.Cancel();
+    }
+}

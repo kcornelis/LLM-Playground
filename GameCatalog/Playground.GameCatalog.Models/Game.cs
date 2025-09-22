@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 //using Microsoft.Data.SqlTypes;
 
 namespace Playground.GameCatalog.Models;
@@ -11,7 +12,7 @@ public class Game
 
     [Required]
     [MaxLength(255)]
-    public string? Title { get; set; }
+    public string Title { get; set; } = string.Empty;
 
     public string? Description { get; set; }
 
@@ -42,13 +43,30 @@ public class Game
     [Column(TypeName = "decimal(5,2)")]
     public decimal? Discount { get; set; }
 
-    public string[] GetAvailablePlatforms()
+    [NotMapped]
+    public string[] AvailablePlatforms
     {
-        return (new[] {
-            SteamDeck == true ? "SteamDeck" : null,
-            Windows == true ? "Windows" : null,
-            Mac == true ? "Mac" : null,
-            Linux == true ? "Linux" : null
-        }).Where(p => p != null).ToArray();
+        get
+        {
+            return [.. (new[] {
+                SteamDeck == true ? "SteamDeck" : null,
+                Windows == true ? "Windows" : null,
+                Mac == true ? "Mac" : null,
+                Linux == true ? "Linux" : null
+            })
+            .Where(p => p != null)
+            .Select(p => p!)];
+        }
+    }
+
+    public string Describe()
+    {
+        return $"{Title} is a {string.Join(", ", Tags ?? [])} game. " +
+               $"{(ReleaseDate.HasValue ? "Released in " + ReleaseDate.Value.Year : "Release date unknown")}. " +
+               $"{(!string.IsNullOrWhiteSpace(Description) ? Description : "No description available.")} " +
+               $"Available on {string.Join(", ", AvailablePlatforms)}. " +
+               $"{(!string.IsNullOrWhiteSpace(Rating) ? "Rated " + Rating.ToLowerInvariant() : "Rating unknown")}" +
+               $"{(Reviews > 0 ? " with " + Reviews + " reviews and a positive ratio of " + PositiveRatio + "%. " : ". ")}" +
+               $"{(Price.HasValue ? (Price == OriginalPrice ? "It is currently priced at " + Price + ". " : "It is currently discounted from " + OriginalPrice + " to " + Price + ", that's a " + Discount + "% discount.") : string.Empty)}";
     }
 }

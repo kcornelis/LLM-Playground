@@ -1,11 +1,14 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 option csharp_namespace = "Playground.GameCatalog.Api";
 
 package GameCatalogApi;
 
 service Catalog {
   rpc Search (SearchRequest) returns (SearchResponse);
+  rpc GenerateEmbeddings (google.protobuf.Empty) returns (stream GenerateEmbeddingsResponse);
 }
 
 message Game {
@@ -20,4 +23,9 @@ message SearchRequest {
 
 message SearchResponse {
   repeated Game items = 1;
+}
+
+message GenerateEmbeddingsResponse {
+    int32 processed = 1;
+    int32 total = 2;
 }

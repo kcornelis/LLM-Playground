@@ -1,11 +1,16 @@
 ﻿@page "/gamecatalog/search"
 @rendermode InteractiveServer
 
+@using Playground.Web.Components.GameCatalog
 @inject GameCatalogClient GameCatalogClient
+@inject IDialogService DialogService
 
 <PageTitle>Game Catalog</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">LLM Text Embedding Search</MudText>
+<MudText Typo="Typo.h3" GutterBottom="true">
+    LLM Text Embedding Search 
+    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Refresh" Color="Color.Primary" OnClick="OpenGenerateEmbeddingsDialog">Generate</MudButton>
+</MudText>
 <MudText Class="mb-8">
     Ever wondered how an AI finds the difference between "cat videos" and "quantum physics"? <br />
     Welcome to a text embedding search playground, where your words are magically transformed into numbers, <br />
@@ -31,16 +36,16 @@
 <MudGrid>
     <MudItem xs="6">
         <div class="d-flex align-center justify-start flex-grow-1 gap-4">
-            <MudTextField @bind-Value="searchQuery" Label="Search games..." Variant="Variant.Outlined"></MudTextField>
-            <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" OnClick="@((e) => SearchGames())" />
+            <MudTextField @bind-Value="SearchQuery" Label="Search games..." Variant="Variant.Outlined"></MudTextField>
+            <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" OnClick="SearchGames" />
         </div>
     </MudItem>
 </MudGrid>
 
 
-@if (games.Any())
+@if (Games.Any())
 {
-    <MudTable Items="@games" Hover="true" Breakpoint="Breakpoint.Sm" Class="mt-8">
+    <MudTable Items="@Games" Hover="true" Breakpoint="Breakpoint.Sm" Class="mt-8">
         <HeaderContent>
             <MudTh>Id</MudTh>
             <MudTh>Title</MudTh>
@@ -55,11 +60,17 @@
 }
 
 @code {
-    private string searchQuery = string.Empty;
-    private IEnumerable<Game> games = Array.Empty<Game>();
+    private string SearchQuery { get; set; } = string.Empty;
+    private Game[] Games { get; set; } = [];
 
     private async Task SearchGames()
     {
-        games = (await GameCatalogClient.SearchAsync(searchQuery)).ToList();
+        Games = await GameCatalogClient.SearchAsync(SearchQuery);
+    }
+
+    private async Task OpenGenerateEmbeddingsDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        await DialogService.ShowAsync<GenerateEmbeddingsDialog>("Generate Embeddings...", options: options);
     }
 }
