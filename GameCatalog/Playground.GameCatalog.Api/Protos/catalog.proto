@@ -15,6 +15,7 @@ message Game {
   int32 Id = 1;
   string Title = 2;
   string Description = 3;
+  double Score = 4;
 }
 
 message SearchRequest {
@@ -22,10 +23,10 @@ message SearchRequest {
 }
 
 message SearchResponse {
-  repeated Game items = 1;
+  repeated Game Items = 1;
 }
 
 message GenerateEmbeddingsResponse {
-    int32 processed = 1;
-    int32 total = 2;
+    int32 Processed = 1;
+    int32 Total = 2;
 }

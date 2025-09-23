@@ -46,8 +46,6 @@ For hot reload during development:
 aspire run -w
 ```
 
-- F5 in VS Code will also launch the Aspire configuration (if you use the provided debug profile) and attach the debugger.
-
 ## First run
 On first run you must configure your OpenAI API key:
 - Open the Aspire dashboard, go to the **Resources** screen for the API service, there should be an error banner on top to configure the missing key.

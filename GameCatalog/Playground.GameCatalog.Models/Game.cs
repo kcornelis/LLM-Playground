@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
-//using Microsoft.Data.SqlTypes;
+using Microsoft.Data.SqlTypes;
 
 namespace Playground.GameCatalog.Models;
 
@@ -18,8 +17,8 @@ public class Game
 
     public string[]? Tags { get; set; }
 
-    // [Column(TypeName = "vector(1998)")]
-    // public SqlVector<float>? Embedding { get; set; }
+    [Column(TypeName = "vector(1998)")]
+    public SqlVector<float>? Embedding { get; set; }
 
     public DateTime? ReleaseDate { get; set; }
 

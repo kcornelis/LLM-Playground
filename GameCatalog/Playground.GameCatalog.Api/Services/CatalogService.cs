@@ -1,6 +1,8 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.Data.SqlTypes;
 using Microsoft.EntityFrameworkCore;
+using Playground.GameCatalog.Api.Tools;
 using Playground.GameCatalog.Models;
 
 namespace Playground.GameCatalog.Api.Services;
@@ -17,22 +19,19 @@ public class CatalogService(ILogger<CatalogService> _logger, GameCatalogContext 
         // Already tested this code without aspire and it works fine.
 
         var games = await _db.Games
-            .Where(g => g.Title.Contains(request.Query))
-            .Select(g => new Game
-            {
-                Id = g.Id,
-                Title = g.Title,
-                Description = g.Description ?? ""
-            })
-            // .Where(g => g.Embedding != null)
-            // .OrderBy(g => EF.Functions.VectorDistance("cosine", g.Embedding.Value, embedding))
+            .Where(g => g.Embedding != null)
+            .OrderBy(g => EF.Functions.VectorDistance("cosine", g.Embedding.Value, new SqlVector<float>(searchQueryEmbedding)))
             .Take(100)
             .ToListAsync();
 
-        // Get the score in code: VectorUtils.CosineSimilarity(g.Embedding.Value.Memory.ToArray(), response.Value.ToFloats().ToArray())
-
         var response = new SearchResponse();
-        response.Items.AddRange(games);
+        response.Items.AddRange(games.Select(g => new Game
+        {
+            Id = g.Id,
+            Title = g.Title,
+            Description = g.Description ?? "",
+            Score = VectorUtils.CosineSimilarity(g.Embedding.Value.Memory.ToArray(), searchQueryEmbedding.ToArray())
+        }));
 
         return response;
     }
@@ -64,7 +63,7 @@ public class CatalogService(ILogger<CatalogService> _logger, GameCatalogContext 
 
             for (var i = 0; i < games.Count; i++)
             {
-                //games[i].Embedding = new SqlVector<float>(embeddings[i]);
+                games[i].Embedding = new SqlVector<float>(embeddings[i]);
             }
 
             await _db.SaveChangesAsync();
