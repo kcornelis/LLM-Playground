@@ -1,0 +1,86 @@
+@page "/gamecatalog/rag"
+
+@inject GameCatalogClient GameCatalogClient
+
+<PageTitle>Game Catalog</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">
+    Retrieval‑augmented generation (RAG)
+</MudText>
+
+<MudText Class="mb-8">
+    This page uses Retrieval‑Augmented Generation (RAG) to answer questions using our game catalog only. <br />
+    We embed each game's title, tags, and description, retrieve the most relevant games for your question, <br />
+    and generate a concise reply grounded in those results. Ask about genres, prices, ratings, or specific titles.
+</MudText>
+
+<MudText Typo="Typo.h4" GutterBottom="true">Inspiration:</MudText>
+<MudText Class="mb-8 pl-8">
+<ul>
+    <li>What are some recent puzzle games under $30?</li>
+    <li>Which co-op platformers were released after 2020?</li>
+    <li>Do you have games with time travel mechanics?</li>
+    <li>What are some highly rated singleplayer adventures?</li>
+    <li>Are there any cheap multiplayer shooters?</li>
+    <li>Which fantasy RPGs are available on Steam Deck?</li>
+    <li>What are some story-rich indie games?</li>
+    <li>Do you have games with positive reviews and controller support?</li>
+    <li>Which classic action games run on Linux?</li>
+    <li>What new releases have great soundtracks?</li>
+</ul>
+</MudText>
+
+<MudGrid>
+    <MudItem xs="6">
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudTextField @bind-Value="Question" Placeholder="Ask about games, tags, price, reviews..." Variant="Variant.Outlined" FullWidth="true" 
+                Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Send" OnAdornmentClick="GetAnswer" Disabled="@IsLoading" />
+            
+            <MudProgressLinear Class="mt-2" Color="Color.Primary" Indeterminate="true" Style="@(IsLoading ? "visibility: visible;" : "visibility: hidden;")" />
+
+            <MudText Class="mt-4" Hidden="@string.IsNullOrWhiteSpace(Answer)">@((MarkupString)(Answer ?? string.Empty))</MudText>
+
+            <MudList T="string" Dense="true" Class="mt-2" Hidden="@(Sources is null || Sources.Length == 0)">
+                <MudListSubheader>Sources</MudListSubheader>
+                @foreach (var g in Sources ?? Array.Empty<string>())
+                {
+                    <MudListItem>
+                        <div class="mud-text-caption">@g</div>
+                    </MudListItem>
+                }
+            </MudList>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+
+@code {
+    private string Question { get; set; } = string.Empty;
+    private string? Answer { get; set; }
+    private string[]? Sources { get; set; }
+    private bool IsLoading { get; set; }
+
+    private async Task GetAnswer()
+    {
+        if (string.IsNullOrWhiteSpace(Question)) return;
+        
+        IsLoading = true;
+        Answer = null;
+        Sources = null;
+
+        try
+        {
+            var result = await GameCatalogClient.AnswerCatalogQuestion(Question);
+            Answer = result.Answer;
+            Sources = result.Sources;
+        }
+        catch
+        {
+            Answer = "We couldn't process your request right now.";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+}

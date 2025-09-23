@@ -9,6 +9,7 @@ package GameCatalogApi;
 service Catalog {
   rpc Search (SearchRequest) returns (SearchResponse);
   rpc GenerateEmbeddings (google.protobuf.Empty) returns (stream GenerateEmbeddingsResponse);
+  rpc AnswerCatalogQuestion (AnswerCatalogQuestionRequest) returns (AnswerCatalogQuestionResponse);
 }
 
 message Game {
@@ -29,4 +30,13 @@ message SearchResponse {
 message GenerateEmbeddingsResponse {
     int32 Processed = 1;
     int32 Total = 2;
+}
+
+message AnswerCatalogQuestionRequest {
+  string Message = 1;
+}
+
+message AnswerCatalogQuestionResponse {
+  string Answer = 1;
+  repeated string Sources = 2;
 }

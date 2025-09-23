@@ -32,7 +32,7 @@
         IsRunning = true;
         try
         {
-            await foreach (var update in CatalogClient.GenerateEmbeddingsStreamAsync())
+            await foreach (var update in CatalogClient.GenerateEmbeddingsStream())
             {
                 Total = update.Total;
                 Processed = update.Processed;

@@ -17,6 +17,7 @@ public class Game
 
     public string[]? Tags { get; set; }
 
+    [NotMapped]
     [Column(TypeName = "vector(1998)")]
     public SqlVector<float>? Embedding { get; set; }
 
@@ -66,6 +67,6 @@ public class Game
                $"Available on {string.Join(", ", AvailablePlatforms)}. " +
                $"{(!string.IsNullOrWhiteSpace(Rating) ? "Rated " + Rating.ToLowerInvariant() : "Rating unknown")}" +
                $"{(Reviews > 0 ? " with " + Reviews + " reviews and a positive ratio of " + PositiveRatio + "%. " : ". ")}" +
-               $"{(Price.HasValue ? (Price == OriginalPrice ? "It is currently priced at " + Price + ". " : "It is currently discounted from " + OriginalPrice + " to " + Price + ", that's a " + Discount + "% discount.") : string.Empty)}";
+               $"{(Price.HasValue ? (Price >= OriginalPrice ? "It is currently priced at " + Price + ". " : "It is currently discounted from " + OriginalPrice + " to " + Price + ", that's a " + Discount + "% discount.") : string.Empty)}";
     }
 }
