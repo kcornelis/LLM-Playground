@@ -1,5 +1,4 @@
 ﻿@page "/gamecatalog/search"
-@rendermode InteractiveServer
 
 @using Playground.Web.Components.GameCatalog
 @inject GameCatalogClient GameCatalogClient
@@ -8,7 +7,7 @@
 <PageTitle>Game Catalog</PageTitle>
 
 <MudText Typo="Typo.h3" GutterBottom="true">
-    LLM Text Embedding Search 
+    Text embedding search 
     <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Refresh" Color="Color.Primary" OnClick="OpenGenerateEmbeddingsDialog">Generate</MudButton>
 </MudText>
 <MudText Class="mb-8">
@@ -35,37 +34,52 @@
 
 <MudGrid>
     <MudItem xs="6">
-        <div class="d-flex align-center justify-start flex-grow-1 gap-4">
-            <MudTextField @bind-Value="SearchQuery" Label="Search games..." Variant="Variant.Outlined"></MudTextField>
-            <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Search" OnClick="SearchGames" />
-        </div>
+        <MudPaper Class="pa-4" Elevation="2">
+            <MudTextField @bind-Value="SearchQuery" Placeholder="Search games..." Variant="Variant.Outlined" FullWidth="true" 
+                Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" OnAdornmentClick="SearchGames" Disabled="@IsLoading" />
+            
+            <MudProgressLinear Class="mt-2" Color="Color.Primary" Indeterminate="true" Style="@(IsLoading ? "visibility: visible;" : "visibility: hidden;")" />
+
+            @if (Games.Any())
+            {
+                <MudTable Items="@Games" Hover="true" Breakpoint="Breakpoint.Sm" Class="mt-8">
+                    <HeaderContent>
+                        <MudTh>Id</MudTh>
+                        <MudTh>Title</MudTh>
+                        <MudTh>Description</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Id">@context.Id</MudTd>
+                        <MudTd DataLabel="Title">@context.Title</MudTd>
+                        <MudTd DataLabel="Description">@context.Description</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            }
+        </MudPaper>
     </MudItem>
 </MudGrid>
 
 
-@if (Games.Any())
-{
-    <MudTable Items="@Games" Hover="true" Breakpoint="Breakpoint.Sm" Class="mt-8">
-        <HeaderContent>
-            <MudTh>Id</MudTh>
-            <MudTh>Title</MudTh>
-            <MudTh>Description</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="Title">@context.Title</MudTd>
-            <MudTd DataLabel="Description">@context.Description</MudTd>
-        </RowTemplate>
-    </MudTable>
-}
-
 @code {
     private string SearchQuery { get; set; } = string.Empty;
     private Game[] Games { get; set; } = [];
+    private bool IsLoading { get; set; }
 
     private async Task SearchGames()
     {
-        Games = await GameCatalogClient.SearchAsync(SearchQuery);
+        if (string.IsNullOrWhiteSpace(SearchQuery)) return;
+        
+        IsLoading = true;
+        Games = [];
+
+        try
+        {
+            Games = await GameCatalogClient.Search(SearchQuery);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     private async Task OpenGenerateEmbeddingsDialog()

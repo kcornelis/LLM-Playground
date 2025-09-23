@@ -1,5 +1,6 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.Data.SqlTypes;
 using Microsoft.EntityFrameworkCore;
 using Playground.GameCatalog.Models;
 
@@ -17,22 +18,21 @@ public class CatalogService(ILogger<CatalogService> _logger, GameCatalogContext 
         // Already tested this code without aspire and it works fine.
 
         var games = await _db.Games
-            .Where(g => g.Title.Contains(request.Query))
-            .Select(g => new Game
-            {
-                Id = g.Id,
-                Title = g.Title,
-                Description = g.Description ?? ""
-            })
-            // .Where(g => g.Embedding != null)
-            // .OrderBy(g => EF.Functions.VectorDistance("cosine", g.Embedding.Value, embedding))
-            .Take(100)
+            .AsNoTracking()
+            .Where(g => g.Title.Contains(request.Query)) // remove when we use sql server 2025
+            //.Where(g => g.Embedding != null)
+            //.OrderBy(g => EF.Functions.VectorDistance("cosine", g.Embedding.Value, new SqlVector<float>(searchQueryEmbedding)))
+            .Take(20)
             .ToListAsync();
 
-        // Get the score in code: VectorUtils.CosineSimilarity(g.Embedding.Value.Memory.ToArray(), response.Value.ToFloats().ToArray())
-
         var response = new SearchResponse();
-        response.Items.AddRange(games);
+        response.Items.AddRange(games.Select(g => new Game
+        {
+            Id = g.Id,
+            Title = g.Title,
+            Description = g.Description ?? "",
+            Score = 0,//Score = VectorUtils.CosineSimilarity(g.Embedding.Value.Memory.ToArray(), searchQueryEmbedding.ToArray())
+        }));
 
         return response;
     }
@@ -64,7 +64,7 @@ public class CatalogService(ILogger<CatalogService> _logger, GameCatalogContext 
 
             for (var i = 0; i < games.Count; i++)
             {
-                //games[i].Embedding = new SqlVector<float>(embeddings[i]);
+                games[i].Embedding = new SqlVector<float>(embeddings[i]);
             }
 
             await _db.SaveChangesAsync();
@@ -78,5 +78,37 @@ public class CatalogService(ILogger<CatalogService> _logger, GameCatalogContext 
         }
 
         _logger.LogInformation("Completed generating embeddings for all games in the catalog");
+    }
+
+    public override async Task<AnswerCatalogQuestionResponse> AnswerCatalogQuestion(AnswerCatalogQuestionRequest request, ServerCallContext context)
+    {
+        _logger.LogInformation("Answer catalog question request: {Message}", request.Message);
+
+        if (string.IsNullOrWhiteSpace(request.Message))
+        {
+            return new AnswerCatalogQuestionResponse { Answer = "Please provide a question about the game catalog." };
+        }
+
+        var chatMessageEmbedding = await _openAIService.GenerateEmbeddingAsync(request.Message);
+
+        // Retrieve candidate set and score in-memory via cosine similarity (portable fallback)
+        var candidates = await _db.Games
+            .AsNoTracking()
+            .Where(g => g.Title.Contains("fifa")) // remove when we use sql server 2025
+            //.Where(g => g.Embedding != null)
+            //.OrderBy(g => EF.Functions.VectorDistance("cosine", g.Embedding.Value, new SqlVector<float>(searchQueryEmbedding)))
+            .Take(20)
+            .ToListAsync(context.CancellationToken);
+
+        var snippets = candidates.Select(g => g.Describe()).ToList();
+
+        // Ask LLM constrained by context
+        var answer = await _openAIService.GenerateCatalogAnswerAsync(request.Message, snippets);
+
+        var response = new AnswerCatalogQuestionResponse { Answer = answer };
+        // Add found games descriptions for debugging purposes
+        response.Sources.AddRange(candidates.Select(g => g.Describe()));
+
+        return response;
     }
 }

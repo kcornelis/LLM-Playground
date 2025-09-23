@@ -6,7 +6,7 @@ namespace Playground.Web.Services;
 
 public class GameCatalogClient(Catalog.CatalogClient client)
 {
-    public async Task<Game[]> SearchAsync(string query)
+    public async Task<Game[]> Search(string query)
     {
         try
         {
@@ -23,12 +23,29 @@ public class GameCatalogClient(Catalog.CatalogClient client)
         }
     }
 
-    public async IAsyncEnumerable<GenerateEmbeddingsResponse> GenerateEmbeddingsStreamAsync([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<GenerateEmbeddingsResponse> GenerateEmbeddingsStream([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         using var call = client.GenerateEmbeddings(new Empty(), cancellationToken: cancellationToken);
         await foreach (var message in call.ResponseStream.ReadAllAsync(cancellationToken))
         {
             yield return message;
+        }
+    }
+
+    public record CatalogQuestionResult(string Answer, string[] Sources);
+
+    public async Task<CatalogQuestionResult> AnswerCatalogQuestion(string message, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await client.AnswerCatalogQuestionAsync(new AnswerCatalogQuestionRequest { Message = message }, cancellationToken: cancellationToken);
+            return new CatalogQuestionResult(response.Answer, [.. response.Sources]);
+        }
+        catch (RpcException ex) when (
+            ex.StatusCode is StatusCode.Unavailable ||
+            (ex.StatusCode is StatusCode.Internal && ex.Status.DebugException is TimeoutRejectedException))
+        {
+            return new CatalogQuestionResult("I couldn't reach the catalog service. Please try again.", []);
         }
     }
 }
