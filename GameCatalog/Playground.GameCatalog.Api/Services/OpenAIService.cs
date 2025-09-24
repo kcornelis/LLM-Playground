@@ -32,28 +32,20 @@ public class OpenAIService(OpenAIClient _openAiClient)
         return [.. response.Value.Select(e => e.ToFloats())];
     }
 
-    public async Task<string> GenerateCatalogAnswerAsync(string userMessage, IEnumerable<string> contextSnippets)
+    public async Task<string> GenerateCatalogAnswerAsync(string systemPrompt, string fewShotExamples, string question, IEnumerable<string> contextSnippets)
     {
         #pragma warning disable OPENAI001 // Responses API marked experimental in SDK
         var responses = _openAiClient.GetOpenAIResponseClient(RagChatModel);
 
         var sb = new StringBuilder();
         sb.AppendLine("System:");
-        sb.AppendLine("You are a helpful Game Catalog Assistant.");
-        sb.AppendLine("- Only answer using the facts provided in the Context.");
-        sb.AppendLine("- If the answer is not in the Context, reply exactly: I don't know, i can only answer questions related to my game catalog.");
-        sb.AppendLine("- Refuse any non-game-related questions politely.");
-        sb.AppendLine("- Keep answers concise.");
+        sb.AppendLine(systemPrompt);
         sb.AppendLine();
         sb.AppendLine("Examples:");
-        sb.AppendLine("Q: Do you have any racing games under $20?");
-        sb.AppendLine("A: Yes, we have several racing games under $20. Gran Turismo 3 is one of them and is priced at $19.99.");
-        sb.AppendLine("Q: Show me details for 'Stardew Valley'.");
-        sb.AppendLine("A: Stardew Valley is an open-ended country-life RPG!");
-        sb.AppendLine("Q: Can you give me some prime numbers?");
-        sb.AppendLine("A: I don't know, i can only answer questions related to my game catalog.");
+        sb.AppendLine(fewShotExamples);
         sb.AppendLine();
-        sb.Append("Question: ").Append(userMessage).AppendLine();
+        sb.Append("Question: ").Append(question);
+        sb.AppendLine();
         sb.AppendLine("Context:");
 
         foreach (var s in contextSnippets)

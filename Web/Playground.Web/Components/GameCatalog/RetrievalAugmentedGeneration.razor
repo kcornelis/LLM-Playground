@@ -1,4 +1,5 @@
 @page "/gamecatalog/rag"
+@using System.Text
 
 @inject GameCatalogClient GameCatalogClient
 
@@ -33,32 +34,35 @@
 <MudGrid>
     <MudItem xs="6">
         <MudPaper Class="pa-4" Elevation="2">
+
+            <MudTextField @bind-Value="SystemPrompt" Label="System prompt:" Variant="Variant.Outlined" Lines="6" />
+            <MudTextField @bind-Value="FewShotExamples" Label="Few-shot examples:" Variant="Variant.Outlined" Lines="6" />
+
             <MudTextField @bind-Value="Question" Placeholder="Ask about games, tags, price, reviews..." Variant="Variant.Outlined" FullWidth="true" Disabled="@IsLoading"
                 Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Send" OnAdornmentClick="GetAnswer" 
                 OnKeyUp="AnswerOnEnter" />
             
             <MudProgressLinear Class="mt-2" Color="Color.Primary" Indeterminate="true" Style="@(IsLoading ? "visibility: visible;" : "visibility: hidden;")" />
 
-            <MudText Class="mt-4" Hidden="@string.IsNullOrWhiteSpace(Answer)">@((MarkupString)(Answer ?? string.Empty))</MudText>
-
-            <MudList T="string" Dense="true" Class="mt-2" Hidden="@(Sources is null || Sources.Length == 0)">
-                <MudListSubheader>Sources</MudListSubheader>
-                @foreach (var g in Sources ?? Array.Empty<string>())
-                {
-                    <MudListItem>
-                        <div class="mud-text-caption">@g</div>
-                    </MudListItem>
-                }
-            </MudList>
+            @for (var i = ChatMessages.Count - 1; i >= 0; i--)
+            {
+                var message = ChatMessages[i];
+                <MudChat ChatPosition="@(i % 2 == 0 ? ChatBubblePosition.End : ChatBubblePosition.Start)">
+                    <MudChatBubble>
+                        @((MarkupString)message)
+                    </MudChatBubble>
+                </MudChat>
+            }
         </MudPaper>
     </MudItem>
 </MudGrid>
 
 
 @code {
+    private string SystemPrompt { get; set; } = CreateSystemPrompt();
+    private string FewShotExamples { get; set; } = CreateFewShotExamples();
     private string Question { get; set; } = string.Empty;
-    private string? Answer { get; set; }
-    private string[]? Sources { get; set; }
+    private List<string> ChatMessages { get; } = new();
     private bool IsLoading { get; set; }
 
     private async Task AnswerOnEnter(KeyboardEventArgs e)
@@ -74,22 +78,40 @@
         if (string.IsNullOrWhiteSpace(Question)) return;
         
         IsLoading = true;
-        Answer = null;
-        Sources = null;
+        ChatMessages.Add(Question);
 
         try
         {
-            var result = await GameCatalogClient.AnswerCatalogQuestion(Question);
-            Answer = result.Answer;
-            Sources = result.Sources;
+            var result = await GameCatalogClient.AnswerCatalogQuestion(SystemPrompt, FewShotExamples, Question);
+            ChatMessages.Add(result.Answer);
+            StateHasChanged();
         }
         catch
         {
-            Answer = "We couldn't process your request right now.";
+            ChatMessages.Add("We couldn't process your request right now.");
         }
         finally
         {
             IsLoading = false;
         }
+    }
+
+    private static string CreateSystemPrompt()
+    {
+        return "You are a helpful Game Catalog Assistant.\n" +
+            "- Only answer using the facts provided in the Context.\n" +
+            "- If the answer is not in the Context, reply why, maybe it's a playstation game not available on steam.\n" +
+            "- Refuse any non-game-related questions politely and funny.\n" +
+            "- Keep answers concise and fun to read.\n" +
+            "- If the users asks more info about a game don't give a list with details. Include a short summary of the tags and the game description.\n" +
+            "- Format the answer in html, use HTML tags like <ul>, <ol>, <li>, <strong>, <p>, never add markdown syntax.";
+    }
+
+    private static string CreateFewShotExamples()
+    {
+        return "Q: Do you have any racing games under $20?\n" +
+            "A: Yes, we have several racing games under $20. GT Legends is one of them and is priced at $19.99.\n" +
+            "Q: Can you give me some prime numbers?\n" +
+            "A: I don't know, I can only answer questions about games in my catalog, this seems a math problem and is way over my head.";
     }
 }

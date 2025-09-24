@@ -34,11 +34,11 @@ public class GameCatalogClient(Catalog.CatalogClient client)
 
     public record CatalogQuestionResult(string Answer, string[] Sources);
 
-    public async Task<CatalogQuestionResult> AnswerCatalogQuestion(string message, CancellationToken cancellationToken = default)
+    public async Task<CatalogQuestionResult> AnswerCatalogQuestion(string systemPrompt, string fewShotExamples, string question, CancellationToken cancellationToken = default)
     {
         try
         {
-            var response = await client.AnswerCatalogQuestionAsync(new AnswerCatalogQuestionRequest { Message = message }, cancellationToken: cancellationToken);
+            var response = await client.AnswerCatalogQuestionAsync(new AnswerCatalogQuestionRequest { SystemPrompt = systemPrompt, FewShotExamples = fewShotExamples, Question = question }, cancellationToken: cancellationToken);
             return new CatalogQuestionResult(response.Answer, [.. response.Sources]);
         }
         catch (RpcException ex) when (

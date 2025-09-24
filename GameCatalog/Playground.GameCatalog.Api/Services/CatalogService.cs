@@ -79,14 +79,14 @@ public class CatalogService(ILogger<CatalogService> _logger, GameCatalogContext 
 
     public override async Task<AnswerCatalogQuestionResponse> AnswerCatalogQuestion(AnswerCatalogQuestionRequest request, ServerCallContext context)
     {
-        _logger.LogInformation("Answer catalog question request: {Message}", request.Message);
+        _logger.LogInformation("Answer catalog question request: {Message}", request.Question);
 
-        if (string.IsNullOrWhiteSpace(request.Message))
+        if (string.IsNullOrWhiteSpace(request.Question))
         {
             return new AnswerCatalogQuestionResponse { Answer = "Please provide a question about the game catalog." };
         }
 
-        var chatMessageEmbedding = await _openAIService.GenerateEmbeddingAsync(request.Message);
+        var chatMessageEmbedding = await _openAIService.GenerateEmbeddingAsync(request.Question);
 
         // Retrieve candidate set and score in-memory via cosine similarity (portable fallback)
         var candidates = await _db.Games
@@ -99,7 +99,7 @@ public class CatalogService(ILogger<CatalogService> _logger, GameCatalogContext 
         var snippets = candidates.Select(g => g.Describe()).ToList();
 
         // Ask LLM constrained by context
-        var answer = await _openAIService.GenerateCatalogAnswerAsync(request.Message, snippets);
+        var answer = await _openAIService.GenerateCatalogAnswerAsync(request.SystemPrompt, request.FewShotExamples, request.Question, snippets);
 
         var response = new AnswerCatalogQuestionResponse { Answer = answer };
         // Add found games descriptions for debugging purposes

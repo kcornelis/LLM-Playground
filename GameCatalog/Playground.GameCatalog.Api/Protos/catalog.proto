@@ -33,7 +33,9 @@ message GenerateEmbeddingsResponse {
 }
 
 message AnswerCatalogQuestionRequest {
-  string Message = 1;
+  string SystemPrompt = 1; 
+  string FewShotExamples = 2;
+  string Question = 3;
 }
 
 message AnswerCatalogQuestionResponse {
