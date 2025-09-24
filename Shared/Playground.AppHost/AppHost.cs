@@ -2,7 +2,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var parameter = builder.AddParameter("openai-api-key");
 
-var sqlServer = builder.AddSqlServer("Playground")
+var sqlServer = builder.AddSqlServer("Playground", port: 40783)
                     .WithVolume(target: "/var/opt/mssql")
                     .WithLifetime(ContainerLifetime.Persistent);
 

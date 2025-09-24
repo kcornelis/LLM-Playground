@@ -68,7 +68,7 @@ public class GameCatalogDbInitializer(
         });
     }
 
-    private async Task SeedDataAsync(GameCatalogContext dbContext, CancellationToken cancellationToken)
+    private static async Task SeedDataAsync(GameCatalogContext dbContext, CancellationToken cancellationToken)
     {
         var strategy = dbContext.Database.CreateExecutionStrategy();
         await strategy.ExecuteAsync(async () =>

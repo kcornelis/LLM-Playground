@@ -17,7 +17,6 @@ public class Game
 
     public string[]? Tags { get; set; }
 
-    [NotMapped]
     [Column(TypeName = "vector(1998)")]
     public SqlVector<float>? Embedding { get; set; }
 
@@ -29,7 +28,7 @@ public class Game
     public bool? SteamDeck { get; set; }
 
     [MaxLength(64)]
-    public string Rating { get; set; }
+    public string Rating { get; set; } = string.Empty;
 
     public int? PositiveRatio { get; set; }
     public int? Reviews { get; set; }

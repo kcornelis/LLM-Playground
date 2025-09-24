@@ -32,38 +32,45 @@
 </ul>
 </MudText>
 
-<MudGrid>
-    <MudItem xs="6">
-        <MudPaper Class="pa-4" Elevation="2">
-            <MudTextField @bind-Value="SearchQuery" Placeholder="Search games..." Variant="Variant.Outlined" FullWidth="true" 
-                Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" OnAdornmentClick="SearchGames" Disabled="@IsLoading" />
-            
-            <MudProgressLinear Class="mt-2" Color="Color.Primary" Indeterminate="true" Style="@(IsLoading ? "visibility: visible;" : "visibility: hidden;")" />
+<MudPaper Class="pa-4" Elevation="2">
+    <MudTextField @bind-Value="SearchQuery" Placeholder="Search games..." Variant="Variant.Outlined" FullWidth="true" Disabled="@IsLoading"
+        Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" OnAdornmentClick="SearchGames" 
+        OnKeyUp="SearchOnEnter" />
+    
+    <MudProgressLinear Class="mt-2" Color="Color.Primary" Indeterminate="true" Style="@(IsLoading ? "visibility: visible;" : "visibility: hidden;")" />
 
-            @if (Games.Any())
-            {
-                <MudTable Items="@Games" Hover="true" Breakpoint="Breakpoint.Sm" Class="mt-8">
-                    <HeaderContent>
-                        <MudTh>Id</MudTh>
-                        <MudTh>Title</MudTh>
-                        <MudTh>Description</MudTh>
-                    </HeaderContent>
-                    <RowTemplate>
-                        <MudTd DataLabel="Id">@context.Id</MudTd>
-                        <MudTd DataLabel="Title">@context.Title</MudTd>
-                        <MudTd DataLabel="Description">@context.Description</MudTd>
-                    </RowTemplate>
-                </MudTable>
-            }
-        </MudPaper>
-    </MudItem>
-</MudGrid>
+    @if (Games.Any())
+    {
+        <MudTable Items="@Games" Hover="true" Breakpoint="Breakpoint.Sm" Class="mt-8">
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>Title</MudTh>
+                <MudTh>Description</MudTh>
+                <MudTh>Score</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Title">@context.Title</MudTd>
+                <MudTd DataLabel="Description">@context.Description</MudTd>
+                <MudTd DataLabel="Score">@context.Score</MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</MudPaper>
 
 
 @code {
     private string SearchQuery { get; set; } = string.Empty;
     private Game[] Games { get; set; } = [];
     private bool IsLoading { get; set; }
+
+    private async Task SearchOnEnter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !IsLoading)
+        {
+            await SearchGames();
+        }
+    }
 
     private async Task SearchGames()
     {

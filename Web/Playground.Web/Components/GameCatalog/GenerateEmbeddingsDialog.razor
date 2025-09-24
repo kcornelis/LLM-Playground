@@ -1,3 +1,4 @@
+@using System.Diagnostics
 @inject Playground.Web.Services.GameCatalogClient CatalogClient
 
 <MudDialog>
@@ -29,6 +30,12 @@
 
     private async Task StartOrCloseDialog()
     {
+        if (Processed > 0)
+        {
+            Dialog.Close(DialogResult.Ok(true));
+            return;
+        }
+
         IsRunning = true;
         try
         {
@@ -38,7 +45,6 @@
                 Processed = update.Processed;
                 StateHasChanged();
             }
-            Dialog.Close(DialogResult.Ok(true));
         }
         catch
         {

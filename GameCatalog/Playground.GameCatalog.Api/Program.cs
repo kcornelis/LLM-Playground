@@ -1,10 +1,12 @@
 using OpenAI;
 using Playground.GameCatalog.Api.Services;
+using Playground.GameCatalog.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-builder.AddSqlServerDbContext<Playground.GameCatalog.Models.GameCatalogContext>("gameCatalogDb");
+
+builder.AddSqlServerDbContext<GameCatalogContext>("gameCatalogDb");
 
 // Add services to the container.
 builder.Services.AddGrpc();

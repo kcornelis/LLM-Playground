@@ -33,8 +33,9 @@
 <MudGrid>
     <MudItem xs="6">
         <MudPaper Class="pa-4" Elevation="2">
-            <MudTextField @bind-Value="Question" Placeholder="Ask about games, tags, price, reviews..." Variant="Variant.Outlined" FullWidth="true" 
-                Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Send" OnAdornmentClick="GetAnswer" Disabled="@IsLoading" />
+            <MudTextField @bind-Value="Question" Placeholder="Ask about games, tags, price, reviews..." Variant="Variant.Outlined" FullWidth="true" Disabled="@IsLoading"
+                Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Send" OnAdornmentClick="GetAnswer" 
+                OnKeyUp="AnswerOnEnter" />
             
             <MudProgressLinear Class="mt-2" Color="Color.Primary" Indeterminate="true" Style="@(IsLoading ? "visibility: visible;" : "visibility: hidden;")" />
 
@@ -59,6 +60,14 @@
     private string? Answer { get; set; }
     private string[]? Sources { get; set; }
     private bool IsLoading { get; set; }
+
+    private async Task AnswerOnEnter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !IsLoading)
+        {
+            await GetAnswer();
+        }
+    }
 
     private async Task GetAnswer()
     {

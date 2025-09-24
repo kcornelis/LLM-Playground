@@ -2,6 +2,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Data.SqlTypes;
 using Microsoft.EntityFrameworkCore;
+using Playground.GameCatalog.Api.Tools;
 using Playground.GameCatalog.Models;
 
 namespace Playground.GameCatalog.Api.Services;
@@ -14,14 +15,10 @@ public class CatalogService(ILogger<CatalogService> _logger, GameCatalogContext 
 
         var searchQueryEmbedding = await _openAIService.GenerateEmbeddingAsync(request.Query);
 
-        // Enable commented code when Aspire releases mssql 2025 (currently on main)
-        // Already tested this code without aspire and it works fine.
-
         var games = await _db.Games
             .AsNoTracking()
-            .Where(g => g.Title.Contains(request.Query)) // remove when we use sql server 2025
-            //.Where(g => g.Embedding != null)
-            //.OrderBy(g => EF.Functions.VectorDistance("cosine", g.Embedding.Value, new SqlVector<float>(searchQueryEmbedding)))
+            .Where(g => g.Embedding != null)
+            .OrderBy(g => EF.Functions.VectorDistance("cosine", g.Embedding.Value, new SqlVector<float>(searchQueryEmbedding)))
             .Take(20)
             .ToListAsync();
 
@@ -30,8 +27,8 @@ public class CatalogService(ILogger<CatalogService> _logger, GameCatalogContext 
         {
             Id = g.Id,
             Title = g.Title,
-            Description = g.Description ?? "",
-            Score = 0,//Score = VectorUtils.CosineSimilarity(g.Embedding.Value.Memory.ToArray(), searchQueryEmbedding.ToArray())
+            Description = g.Describe(),
+            Score = VectorUtils.CosineSimilarity(g.Embedding.Value.Memory.ToArray(), searchQueryEmbedding.ToArray())
         }));
 
         return response;
@@ -94,9 +91,8 @@ public class CatalogService(ILogger<CatalogService> _logger, GameCatalogContext 
         // Retrieve candidate set and score in-memory via cosine similarity (portable fallback)
         var candidates = await _db.Games
             .AsNoTracking()
-            .Where(g => g.Title.Contains("fifa")) // remove when we use sql server 2025
-            //.Where(g => g.Embedding != null)
-            //.OrderBy(g => EF.Functions.VectorDistance("cosine", g.Embedding.Value, new SqlVector<float>(searchQueryEmbedding)))
+            .Where(g => g.Embedding != null)
+            .OrderBy(g => EF.Functions.VectorDistance("cosine", g.Embedding.Value, new SqlVector<float>(chatMessageEmbedding)))
             .Take(20)
             .ToListAsync(context.CancellationToken);
 
