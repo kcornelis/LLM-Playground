@@ -35,21 +35,21 @@
     <MudItem xs="6">
         <MudPaper Class="pa-4" Elevation="2">
 
-            <MudTextField @bind-Value="SystemPrompt" Label="System prompt:" Variant="Variant.Outlined" Lines="6" />
-            <MudTextField @bind-Value="FewShotExamples" Label="Few-shot examples:" Variant="Variant.Outlined" Lines="6" />
+            <MudTextField @bind-Value="SystemPrompt" Label="System prompt:" Variant="Variant.Outlined" Lines="8" />
+            <MudTextField @bind-Value="FewShotExamples" Label="Few-shot examples:" Variant="Variant.Outlined" Lines="4" />
 
-            <MudTextField @bind-Value="Question" Placeholder="Ask about games, tags, price, reviews..." Variant="Variant.Outlined" FullWidth="true" Disabled="@IsLoading"
+            <MudTextField @bind-Value="Question" Placeholder="Ask about games, tags, price, reviews..." Variant="Variant.Outlined" FullWidth="true" Disabled="@isLoading"
                 Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Send" OnAdornmentClick="GetAnswer" 
                 OnKeyUp="AnswerOnEnter" />
             
-            <MudProgressLinear Class="mt-2" Color="Color.Primary" Indeterminate="true" Style="@(IsLoading ? "visibility: visible;" : "visibility: hidden;")" />
+            <MudProgressLinear Class="mt-2" Color="Color.Primary" Indeterminate="true" Style="@(isLoading ? "visibility: visible;" : "visibility: hidden;")" />
 
-            @for (var i = ChatMessages.Count - 1; i >= 0; i--)
+            @for (var i = chatMessages.Count - 1; i >= 0; i--)
             {
-                var message = ChatMessages[i];
+                var message = chatMessages[i];
                 <MudChat ChatPosition="@(i % 2 == 0 ? ChatBubblePosition.End : ChatBubblePosition.Start)">
                     <MudChatBubble>
-                        @((MarkupString)message)
+                        @ToMarkup(message)
                     </MudChatBubble>
                 </MudChat>
             }
@@ -62,12 +62,12 @@
     private string SystemPrompt { get; set; } = CreateSystemPrompt();
     private string FewShotExamples { get; set; } = CreateFewShotExamples();
     private string Question { get; set; } = string.Empty;
-    private List<string> ChatMessages { get; } = new();
-    private bool IsLoading { get; set; }
+    private List<string> chatMessages = new();
+    private bool isLoading;
 
     private async Task AnswerOnEnter(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter" && !IsLoading)
+        if (e.Key == "Enter" && !isLoading)
         {
             await GetAnswer();
         }
@@ -77,22 +77,21 @@
     {
         if (string.IsNullOrWhiteSpace(Question)) return;
         
-        IsLoading = true;
-        ChatMessages.Add(Question);
+        isLoading = true;
+        chatMessages.Add(Question);
 
         try
         {
             var result = await GameCatalogClient.AnswerCatalogQuestion(SystemPrompt, FewShotExamples, Question);
-            ChatMessages.Add(result.Answer);
-            StateHasChanged();
+            chatMessages.Add(result.Answer);
         }
         catch
         {
-            ChatMessages.Add("We couldn't process your request right now.");
+            chatMessages.Add("We couldn't process your request right now.");
         }
         finally
         {
-            IsLoading = false;
+            isLoading = false;
         }
     }
 

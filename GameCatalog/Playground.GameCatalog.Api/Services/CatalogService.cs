@@ -18,7 +18,7 @@ public class CatalogService(ILogger<CatalogService> _logger, GameCatalogContext 
         var games = await _db.Games
             .AsNoTracking()
             .Where(g => g.Embedding != null)
-            .OrderBy(g => EF.Functions.VectorDistance("cosine", g.Embedding.Value, new SqlVector<float>(searchQueryEmbedding)))
+            .OrderBy(g => EF.Functions.VectorDistance("cosine", g.Embedding!.Value, new SqlVector<float>(searchQueryEmbedding)))
             .Take(20)
             .ToListAsync();
 
@@ -28,7 +28,7 @@ public class CatalogService(ILogger<CatalogService> _logger, GameCatalogContext 
             Id = g.Id,
             Title = g.Title,
             Description = g.Describe(),
-            Score = VectorUtils.CosineSimilarity(g.Embedding.Value.Memory.ToArray(), searchQueryEmbedding.ToArray())
+            Score = VectorUtils.CosineSimilarity(g.Embedding!.Value.Memory.ToArray(), searchQueryEmbedding.ToArray())
         }));
 
         return response;

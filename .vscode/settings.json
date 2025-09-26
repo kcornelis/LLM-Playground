@@ -1,8 +1,5 @@
 {
     "[csharp]": {
-        "editor.codeActionsOnSave": [
-            "source.organizeImports"
-        ]
     },
     "csharpOrganizeUsings.splitGroups": false
 }

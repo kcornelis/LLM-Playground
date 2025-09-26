@@ -3,16 +3,16 @@
 <MudDialog>
     <DialogContent>
         <MudText Class="mt-2">
-        @(IsCompleted ? (MarkupString)"Generation completed successfully! Click ok to close the dialog." :
-          IsRunning ? (MarkupString)"Generation in progress... Please wait." : 
-          (MarkupString)"Generates embeddings for the catalog — costs a few OpenAI credits. <br />Click ok if you dare (and have credits).")
+        @(IsCompleted ? ToMarkup("Generation completed successfully! Click ok to close the dialog.") :
+          isRunning ? ToMarkup("Generation in progress... Please wait.") : 
+          ToMarkup("Generates embeddings for the catalog — costs a few OpenAI credits. <br />Click ok if you dare (and have credits)."))
         </MudText>
-        <MudProgressLinear Class="@(IsRunning || IsCompleted ? "mt-4 visible" : "mt-4 invisible")" Color="Color.Primary" Value="@ProgressPercent" />
-        <MudText Class="@(IsRunning || IsCompleted ? "mt-2 visible" : "mt-2 invisible")">Processed @Processed / @Total</MudText>
+        <MudProgressLinear Class="@(isRunning || IsCompleted ? "mt-4 visible" : "mt-4 invisible")" Color="Color.Primary" Value="@ProgressPercent" />
+        <MudText Class="@(isRunning || IsCompleted ? "mt-2 visible" : "mt-2 invisible")">Processed @processed / @total</MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Secondary" Disabled="@(IsRunning || IsCompleted)" OnClick="CloseDialog">Cancel</MudButton>
-        <MudButton Color="Color.Primary" Disabled="@IsRunning" OnClick="StartOrCloseDialog">Ok</MudButton>
+        <MudButton Color="Color.Secondary" Disabled="@(isRunning || IsCompleted)" OnClick="CloseDialog">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Disabled="@isRunning" OnClick="StartOrCloseDialog">Ok</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -20,28 +20,28 @@
     [CascadingParameter]
     private IMudDialogInstance Dialog { get; set; } = default!;
 
-    private bool IsRunning { get; set; }
-    private bool IsCompleted => !IsRunning && Total > 0;
+    private bool isRunning;
+    private bool IsCompleted => !isRunning && total > 0;
 
-    private int Processed { get; set; }
-    private int Total { get; set; }
-    private double ProgressPercent => Total > 0 ? (double)Processed / Total * 100 : 0;
+    private int processed { get; set; }
+    private int total { get; set; }
+    private double ProgressPercent => total > 0 ? (double)processed / total * 100 : 0;
 
     private async Task StartOrCloseDialog()
     {
-        if (Processed > 0)
+        if (processed > 0)
         {
             Dialog.Close(DialogResult.Ok(true));
             return;
         }
 
-        IsRunning = true;
+        isRunning = true;
         try
         {
             await foreach (var update in CatalogClient.GenerateEmbeddingsStream())
             {
-                Total = update.Total;
-                Processed = update.Processed;
+                total = update.Total;
+                processed = update.Processed;
                 StateHasChanged();
             }
         }
@@ -52,7 +52,7 @@
         }
         finally
         {
-            IsRunning = false;
+            isRunning = false;
         }
     }
 

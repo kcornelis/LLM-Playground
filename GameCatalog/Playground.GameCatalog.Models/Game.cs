@@ -60,12 +60,12 @@ public class Game
 
     public string Describe()
     {
-        return $"{Title} is a {string.Join(", ", Tags ?? [])} game. " +
-               $"{(ReleaseDate.HasValue ? "Released in " + ReleaseDate.Value.Year : "Release date unknown")}. " +
-               $"{(!string.IsNullOrWhiteSpace(Description) ? Description : "No description available.")} " +
-               $"Available on {string.Join(", ", AvailablePlatforms)}. " +
+        return $"{Title} is a game {(ReleaseDate.HasValue ? " released in the year " + ReleaseDate.Value.Year : " with an unknown release date")}. \n" +
+               $"It has the following characteristics: {string.Join(", ", Tags ?? [])}. \n" +
+               $"{(!string.IsNullOrWhiteSpace(Description) ? Description : "No description available.")} \n" +
+               $"Available on {string.Join(", ", AvailablePlatforms)}. \n" +
                $"{(!string.IsNullOrWhiteSpace(Rating) ? "Rated " + Rating.ToLowerInvariant() : "Rating unknown")}" +
-               $"{(Reviews > 0 ? " with " + Reviews + " reviews and a positive ratio of " + PositiveRatio + "%. " : ". ")}" +
+               $"{(Reviews > 0 ? " with " + Reviews + " reviews and a positive ratio of " + PositiveRatio + "%. \n" : ". \n")}" +
                $"{(Price.HasValue ? (Price >= OriginalPrice ? "It is currently priced at " + Price + ". " : "It is currently discounted from " + OriginalPrice + " to " + Price + ", that's a " + Discount + "% discount.") : string.Empty)}";
     }
 }

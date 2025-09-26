@@ -33,15 +33,15 @@
 </MudText>
 
 <MudPaper Class="pa-4" Elevation="2">
-    <MudTextField @bind-Value="SearchQuery" Placeholder="Search games..." Variant="Variant.Outlined" FullWidth="true" Disabled="@IsLoading"
+    <MudTextField @bind-Value="SearchQuery" Placeholder="Search games..." Variant="Variant.Outlined" FullWidth="true" Disabled="@isLoading"
         Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" OnAdornmentClick="SearchGames" 
         OnKeyUp="SearchOnEnter" />
     
-    <MudProgressLinear Class="mt-2" Color="Color.Primary" Indeterminate="true" Style="@(IsLoading ? "visibility: visible;" : "visibility: hidden;")" />
+    <MudProgressLinear Class="mt-2" Color="Color.Primary" Indeterminate="true" Style="@(isLoading ? "visibility: visible;" : "visibility: hidden;")" />
 
-    @if (Games.Any())
+    @if (games.Any())
     {
-        <MudTable Items="@Games" Hover="true" Breakpoint="Breakpoint.Sm" Class="mt-8">
+        <MudTable Items="@games" Hover="true" Breakpoint="Breakpoint.Sm" Class="mt-8">
             <HeaderContent>
                 <MudTh>Id</MudTh>
                 <MudTh>Title</MudTh>
@@ -61,12 +61,12 @@
 
 @code {
     private string SearchQuery { get; set; } = string.Empty;
-    private Game[] Games { get; set; } = [];
-    private bool IsLoading { get; set; }
+    private Game[] games = [];
+    private bool isLoading;
 
     private async Task SearchOnEnter(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter" && !IsLoading)
+        if (e.Key == "Enter" && !isLoading)
         {
             await SearchGames();
         }
@@ -76,16 +76,16 @@
     {
         if (string.IsNullOrWhiteSpace(SearchQuery)) return;
         
-        IsLoading = true;
-        Games = [];
+        isLoading = true;
+        games = [];
 
         try
         {
-            Games = await GameCatalogClient.Search(SearchQuery);
+            games = await GameCatalogClient.Search(SearchQuery);
         }
         finally
         {
-            IsLoading = false;
+            isLoading = false;
         }
     }
 
