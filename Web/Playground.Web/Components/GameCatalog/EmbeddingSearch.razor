@@ -1,10 +1,12 @@
 ﻿@page "/gamecatalog/search"
 
+@using Microsoft.AspNetCore.WebUtilities
 @using Playground.Web.Components.GameCatalog.Shared
 @using Playground.Web.Components.GameCatalog.Dialogs
 
 @inject GameCatalogClient GameCatalogClient
 @inject IDialogService DialogService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Game Catalog</PageTitle>
 
@@ -58,9 +60,18 @@ else if (!isLoading && !string.IsNullOrWhiteSpace(SearchQuery))
 
 
 @code {
+    [SupplyParameterFromQuery(Name = "q")]
     private string SearchQuery { get; set; } = string.Empty;
     private Game[] games = [];
     private bool isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(SearchQuery))
+        {
+            await SearchGames();
+        }
+    }
 
     private async Task SearchOnEnter(KeyboardEventArgs e)
     {
@@ -71,24 +82,46 @@ else if (!isLoading && !string.IsNullOrWhiteSpace(SearchQuery))
     }
 
     private async Task SearchGames()
-    {
-        if (string.IsNullOrWhiteSpace(SearchQuery))
-        {
-            games = [];
-            return;
-        } 
-        
+    {      
         isLoading = true;
         games = [];
 
         try
         {
+            if (string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                games = [];
+                return;
+            } 
+
             games = await GameCatalogClient.Search(SearchQuery);
         }
         finally
         {
+            UpdateSearchQueryParameter(SearchQuery);
             isLoading = false;
         }
+    }
+
+    private void UpdateSearchQueryParameter(string searchTerm)
+    {
+        var oldSearchParam = GetSearchQueryParameter();
+        var newSearchParam = string.IsNullOrWhiteSpace(searchTerm) ? null : searchTerm;
+
+        if(oldSearchParam == newSearchParam)
+        {
+            return;
+        }
+
+        var uri = NavigationManager.GetUriWithQueryParameter("q", newSearchParam);
+        NavigationManager.NavigateTo(uri, replace: true);
+    }
+
+    private string? GetSearchQueryParameter()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var searchTerm);
+        return searchTerm;
     }
 
     private async Task OpenGenerateEmbeddingsDialog()
