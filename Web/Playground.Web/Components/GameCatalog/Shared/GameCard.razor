@@ -1,0 +1,42 @@
+@using Playground.Web.Components.GameCatalog.Dialogs
+
+@inject IDialogService DialogService
+
+<MudCard Elevation="2" Class="d-flex flex-column" Style="height: 100%;">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">@Game.Title</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.Info" 
+                           Color="Color.Primary" 
+                           Size="Size.Small"
+                           OnClick="ShowDetails" />
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent Class="flex-grow-1">
+        <MudText Typo="Typo.body2">@Game.Description</MudText>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public Game Game { get; set; } = default!;
+
+    private async Task ShowDetails()
+    {
+        var parameters = new DialogParameters<GameDetailsDialog>
+        {
+            { x => x.Game, Game }
+        };
+
+        var options = new DialogOptions
+        { 
+            CloseOnEscapeKey = true, 
+            MaxWidth = MaxWidth.Small, 
+            FullWidth = true 
+        };
+
+        await DialogService.ShowAsync<GameDetailsDialog>("Game Details", parameters, options);
+    }
+}

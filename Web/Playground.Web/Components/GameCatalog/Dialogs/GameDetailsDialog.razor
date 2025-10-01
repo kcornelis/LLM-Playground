@@ -1,0 +1,29 @@
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body1" Class="mb-2">
+            <strong>ID:</strong> @Game.Id
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-2">
+            <strong>Score:</strong> @Game.Score.ToString("F4")
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-2">
+            <strong>Title:</strong> @Game.Title
+        </MudText>
+        <MudText Typo="Typo.body1">
+            <strong>Description:</strong> @Game.Description
+        </MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Game Game { get; set; } = default!;
+
+    private void Close() => Dialog.Close();
+}

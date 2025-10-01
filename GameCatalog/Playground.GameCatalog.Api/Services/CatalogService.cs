@@ -92,7 +92,7 @@ public class CatalogService(ILogger<CatalogService> _logger, GameCatalogContext 
         var candidates = await _db.Games
             .AsNoTracking()
             .Where(g => g.Embedding != null)
-            .OrderBy(g => EF.Functions.VectorDistance("cosine", g.Embedding.Value, new SqlVector<float>(chatMessageEmbedding)))
+            .OrderBy(g => EF.Functions.VectorDistance("cosine", g.Embedding!.Value, new SqlVector<float>(chatMessageEmbedding)))
             .Take(20)
             .ToListAsync(context.CancellationToken);
 

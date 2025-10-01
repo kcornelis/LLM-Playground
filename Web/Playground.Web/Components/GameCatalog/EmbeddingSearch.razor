@@ -1,6 +1,8 @@
 ﻿@page "/gamecatalog/search"
 
-@using Playground.Web.Components.GameCatalog
+@using Playground.Web.Components.GameCatalog.Shared
+@using Playground.Web.Components.GameCatalog.Dialogs
+
 @inject GameCatalogClient GameCatalogClient
 @inject IDialogService DialogService
 
@@ -32,31 +34,27 @@
 </ul>
 </MudText>
 
-<MudPaper Class="pa-4" Elevation="2">
-    <MudTextField @bind-Value="SearchQuery" Placeholder="Search games..." Variant="Variant.Outlined" FullWidth="true" Disabled="@isLoading"
-        Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" OnAdornmentClick="SearchGames" 
-        OnKeyUp="SearchOnEnter" />
-    
-    <MudProgressLinear Class="mt-2" Color="Color.Primary" Indeterminate="true" Style="@(isLoading ? "visibility: visible;" : "visibility: hidden;")" />
+<MudTextField @bind-Value="SearchQuery" Placeholder="Search games..." Variant="Variant.Outlined" FullWidth="true" Disabled="@isLoading"
+    Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" OnAdornmentClick="SearchGames" 
+    OnKeyUp="SearchOnEnter" />
 
-    @if (games.Any())
-    {
-        <MudTable Items="@games" Hover="true" Breakpoint="Breakpoint.Sm" Class="mt-8">
-            <HeaderContent>
-                <MudTh>Id</MudTh>
-                <MudTh>Title</MudTh>
-                <MudTh>Description</MudTh>
-                <MudTh>Score</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Id">@context.Id</MudTd>
-                <MudTd DataLabel="Title">@context.Title</MudTd>
-                <MudTd DataLabel="Description">@context.Description</MudTd>
-                <MudTd DataLabel="Score">@context.Score</MudTd>
-            </RowTemplate>
-        </MudTable>
-    }
-</MudPaper>
+<MudProgressLinear Class="mt-2" Color="Color.Primary" Indeterminate="true" Style="@(isLoading ? "visibility: visible;" : "visibility: hidden;")" />
+
+@if (games.Any())
+{
+    <MudGrid Class="mt-8">
+        @foreach (var game in games)
+        {
+            <MudItem xs="12" sm="6" md="4" lg="3">
+                <GameCard Game="@game" />
+            </MudItem>
+        }
+    </MudGrid>
+}
+else if (!isLoading && !string.IsNullOrWhiteSpace(SearchQuery))
+{
+    <MudText Typo="Typo.body1" Class="mt-8">No games found for "<strong>@SearchQuery</strong>"</MudText>
+}
 
 
 @code {
@@ -74,7 +72,11 @@
 
     private async Task SearchGames()
     {
-        if (string.IsNullOrWhiteSpace(SearchQuery)) return;
+        if (string.IsNullOrWhiteSpace(SearchQuery))
+        {
+            games = [];
+            return;
+        } 
         
         isLoading = true;
         games = [];

@@ -6,6 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <WarningsAsErrors>RZ2012</WarningsAsErrors>
+  </PropertyGroup>
+
   <ItemGroup>
     <Using Include="Playground.Web" />
     <Using Include="Playground.Web.Services" />
