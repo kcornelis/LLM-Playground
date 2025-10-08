@@ -1,5 +1,46 @@
 {
+    "mssql.connectionGroups": [
+        {
+            "name": "ROOT",
+            "id": "2BF6418C-21F1-4A59-8509-0E7FD7857E49"
+        }
+    ],
+    "remote.autoForwardPortsSource": "hybrid",
+    "mssql.connections": [
+        {
+            "server": "127.0.0.1,40783",
+            "port": 40783,
+            "user": "sa",
+            "password": "",
+            "authenticationType": "SqlLogin",
+            "encrypt": "true",
+            "trustServerCertificate": true,
+            "connectTimeout": 30,
+            "commandTimeout": 30,
+            "connectRetryCount": 1,
+            "connectRetryInterval": 10,
+            "applicationName": "vscode-mssql",
+            "savePassword": true,
+            "id": "20AC13FC-B497-4719-B866-3F2A61CA59AB",
+            "groupId": "2BF6418C-21F1-4A59-8509-0E7FD7857E49",
+            "database": "",
+            "profileSource": 0
+        }
+    ],
     "[csharp]": {
+        "editor.maxTokenizationLineLength": 2500,
+        "editor.formatOnType": true
     },
-    "csharpOrganizeUsings.splitGroups": false
+    "csharpOrganizeUsings.splitGroups": false,
+    "files.exclude": {
+        "**/bin": true,
+        "**/obj": true,
+        "**/.vs": true,
+        "**/.vscode": false
+    },
+    "search.exclude": {
+        "**/bin": true,
+        "**/obj": true,
+        "**/node_modules": true
+    }
 }
