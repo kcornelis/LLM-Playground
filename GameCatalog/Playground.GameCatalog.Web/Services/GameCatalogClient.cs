@@ -1,8 +1,9 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Playground.GameCatalog.Api;
 using Polly.Timeout;
 
-namespace Playground.Web.Services;
+namespace Playground.GameCatalog.Web.Services;
 
 public class GameCatalogClient(Catalog.CatalogClient client)
 {

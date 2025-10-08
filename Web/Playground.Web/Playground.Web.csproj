@@ -11,28 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Using Include="Playground.Web" />
-    <Using Include="Playground.Web.Services" />
-    <Using Include="Playground.GameCatalog.Api" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery.Yarp" Version="9.5.0" />
     <PackageReference Include="MudBlazor" Version="8.12.0" />
     <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
-    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.72.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\Playground.ServiceDefaults\Playground.ServiceDefaults.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="..\..\GameCatalog\Playground.GameCatalog.Api\Protos\catalog.proto" GrpcServices="Client" Link="GameCatalog\Protos\catalog.proto" />
+    <ProjectReference Include="..\..\GameCatalog\Playground.GameCatalog.Web\Playground.GameCatalog.Web.csproj" />
   </ItemGroup>
 
 </Project>

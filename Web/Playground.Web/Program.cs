@@ -1,6 +1,6 @@
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Playground.Web.Components;
 using MudBlazor.Services;
+using Playground.GameCatalog.Web;
+using Playground.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,11 +11,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddOutputCache();
 builder.Services.AddMudServices();
+builder.Services.AddGameCatalogServices();
 
-var isHttps = builder.Configuration["DOTNET_LAUNCH_PROFILE"] == "https";
-builder.Services.AddSingleton<GameCatalogClient>()
-    .AddGrpcServiceReference<Catalog.CatalogClient>($"{(isHttps ? "https" : "http")}://gameCatalogApi", failureStatus: HealthStatus.Degraded);
-    
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -25,15 +22,13 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAntiforgery();
-
 app.UseOutputCache();
-
 app.MapStaticAssets();
 
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+    .AddInteractiveServerRenderMode()
+    .AddAdditionalAssemblies(typeof(Playground.GameCatalog.Web.ServiceCollectionExtensions).Assembly);
 
 app.MapDefaultEndpoints();
 
