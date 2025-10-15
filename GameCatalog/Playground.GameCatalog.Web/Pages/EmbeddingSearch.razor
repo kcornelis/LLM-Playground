@@ -2,7 +2,7 @@
 
 @using Microsoft.AspNetCore.WebUtilities
 
-@inject GameCatalogClient GameCatalogClient
+@inject CatalogClient CatalogClient
 @inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 
@@ -92,7 +92,7 @@ else if (!isLoading && !string.IsNullOrWhiteSpace(SearchQuery))
                 return;
             } 
 
-            games = await GameCatalogClient.Search(SearchQuery);
+            games = await CatalogClient.Search(SearchQuery);
         }
         finally
         {

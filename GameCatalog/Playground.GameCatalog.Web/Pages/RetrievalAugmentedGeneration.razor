@@ -1,7 +1,7 @@
 @page "/gamecatalog/rag"
 @using System.Text
 
-@inject GameCatalogClient GameCatalogClient
+@inject CatalogClient CatalogClient
 
 <PageTitle>Game Catalog</PageTitle>
 
@@ -82,7 +82,7 @@
 
         try
         {
-            var result = await GameCatalogClient.AnswerCatalogQuestion(SystemPrompt, FewShotExamples, Question);
+            var result = await CatalogClient.AnswerCatalogQuestion(SystemPrompt, FewShotExamples, Question);
             chatMessages.Add(result.Answer);
         }
         catch

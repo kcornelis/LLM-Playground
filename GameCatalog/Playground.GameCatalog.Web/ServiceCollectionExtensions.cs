@@ -9,7 +9,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddGameCatalogServices(this IServiceCollection services)
     {
-        services.AddSingleton<GameCatalogClient>();
+        services.AddSingleton<CatalogClient>();
         services.AddGrpcServiceReference<Catalog.CatalogClient>($"https://gameCatalogApi", failureStatus: HealthStatus.Degraded);
 
         return services;

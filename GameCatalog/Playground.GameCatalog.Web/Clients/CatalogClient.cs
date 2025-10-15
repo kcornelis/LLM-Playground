@@ -5,7 +5,7 @@ using Polly.Timeout;
 
 namespace Playground.GameCatalog.Web.Services;
 
-public class GameCatalogClient(Catalog.CatalogClient client)
+public class CatalogClient(Catalog.CatalogClient client)
 {
     public async Task<Game[]> Search(string query)
     {
