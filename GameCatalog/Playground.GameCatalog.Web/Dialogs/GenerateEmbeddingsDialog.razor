@@ -1,4 +1,4 @@
-@inject CatalogClient CatalogClient
+@inject Catalog.CatalogClient CatalogClient
 
 <MudDialog>
     <DialogContent>
@@ -38,10 +38,11 @@
         isRunning = true;
         try
         {
-            await foreach (var update in CatalogClient.GenerateEmbeddingsStream())
+            using var call = CatalogClient.GenerateEmbeddings(new Empty());
+            await foreach (var message in call.ResponseStream.ReadAllAsync())
             {
-                total = update.Total;
-                processed = update.Processed;
+                total = message.Total;
+                processed = message.Processed;
                 StateHasChanged();
             }
         }

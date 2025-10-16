@@ -4,37 +4,13 @@ using OpenAI.Responses;
 
 namespace Playground.GameCatalog.Api.Services;
 
-public class OpenAIService(OpenAIClient _openAiClient)
+public class ResponseService(OpenAIClient _openAiClient)
 {
-    private const string EmbeddingModel = "text-embedding-3-large";
-    private const int EmbeddingDimensions = 1998; // max supported in SQL Server 2025
     private const string RagChatModel = "gpt-4o-mini";
 
-    public async Task<ReadOnlyMemory<float>> GenerateEmbeddingAsync(string text)
+    public async Task<string> GenerateAnswerAsync(string systemPrompt, string fewShotExamples, string question, IEnumerable<string> contextSnippets)
     {
-        var client = _openAiClient.GetEmbeddingClient(EmbeddingModel);
-        var response = await client.GenerateEmbeddingAsync(text, new OpenAI.Embeddings.EmbeddingGenerationOptions
-        {
-            Dimensions = EmbeddingDimensions
-        });
-
-        return response.Value.ToFloats();
-    }
-
-    public async Task<ReadOnlyMemory<float>[]> GenerateEmbeddingsAsync(string[] texts)
-    {
-        var client = _openAiClient.GetEmbeddingClient(EmbeddingModel);
-        var response = await client.GenerateEmbeddingsAsync(texts, new OpenAI.Embeddings.EmbeddingGenerationOptions
-        {
-            Dimensions = EmbeddingDimensions
-        });
-
-        return [.. response.Value.Select(e => e.ToFloats())];
-    }
-
-    public async Task<string> GenerateCatalogAnswerAsync(string systemPrompt, string fewShotExamples, string question, IEnumerable<string> contextSnippets)
-    {
-        #pragma warning disable OPENAI001 // Responses API marked experimental in SDK
+#pragma warning disable OPENAI001 // Responses API marked experimental in SDK
         var responses = _openAiClient.GetOpenAIResponseClient(RagChatModel);
 
         var sb = new StringBuilder();
@@ -73,7 +49,6 @@ public class OpenAIService(OpenAIClient _openAiClient)
         }
 
         return "I don't know based on the catalog.";
-        #pragma warning restore OPENAI001
+#pragma warning restore OPENAI001
     }
 }
-

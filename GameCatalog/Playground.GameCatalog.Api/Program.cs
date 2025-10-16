@@ -12,13 +12,13 @@ builder.AddSqlServerDbContext<GameCatalogContext>("gameCatalogDb");
 builder.Services.AddGrpc();
 builder.Services.AddGrpcHealthChecks();
 
-builder.Services.AddSingleton(sp =>
-{
-    return new OpenAIClient(builder.Configuration["OpenAI:ApiKey"]);
-});
+var openAIClient = new OpenAIClient(builder.Configuration["OpenAI:ApiKey"]);
 
-// Register OpenApiService (initialization only)
-builder.Services.AddSingleton<OpenAIService>();
+builder.Services.AddSingleton(openAIClient);
+
+//builder.Services.AddSingleton<ChatService>();
+builder.Services.AddSingleton<EmbeddingService>();
+builder.Services.AddSingleton<ResponseService>();
 
 var app = builder.Build();
 

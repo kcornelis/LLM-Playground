@@ -2,7 +2,7 @@
 
 @using Microsoft.AspNetCore.WebUtilities
 
-@inject CatalogClient CatalogClient
+@inject Catalog.CatalogClient CatalogClient
 @inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 
@@ -92,7 +92,8 @@ else if (!isLoading && !string.IsNullOrWhiteSpace(SearchQuery))
                 return;
             } 
 
-            games = await CatalogClient.Search(SearchQuery);
+            var response = await CatalogClient.SimpleSemanticSearchAsync(new SimpleSemanticSearchRequest { Query = SearchQuery });
+            games = [.. response.Items];
         }
         finally
         {

@@ -1,7 +1,7 @@
 @page "/gamecatalog/rag"
 @using System.Text
 
-@inject CatalogClient CatalogClient
+@inject Catalog.CatalogClient CatalogClient
 
 <PageTitle>Game Catalog</PageTitle>
 
@@ -43,16 +43,8 @@
                 OnKeyUp="AnswerOnEnter" />
             
             <MudProgressLinear Class="mt-2" Color="Color.Primary" Indeterminate="true" Style="@(isLoading ? "visibility: visible;" : "visibility: hidden;")" />
-
-            @for (var i = chatMessages.Count - 1; i >= 0; i--)
-            {
-                var message = chatMessages[i];
-                <MudChat ChatPosition="@(i % 2 == 0 ? ChatBubblePosition.End : ChatBubblePosition.Start)">
-                    <MudChatBubble>
-                        @ToMarkup(message)
-                    </MudChatBubble>
-                </MudChat>
-            }
+            
+            @ToMarkup(Answer)
         </MudPaper>
     </MudItem>
 </MudGrid>
@@ -62,7 +54,7 @@
     private string SystemPrompt { get; set; } = CreateSystemPrompt();
     private string FewShotExamples { get; set; } = CreateFewShotExamples();
     private string Question { get; set; } = string.Empty;
-    private List<string> chatMessages = new();
+    private string Answer = string.Empty;
     private bool isLoading;
 
     private async Task AnswerOnEnter(KeyboardEventArgs e)
@@ -78,16 +70,15 @@
         if (string.IsNullOrWhiteSpace(Question)) return;
         
         isLoading = true;
-        chatMessages.Add(Question);
 
         try
         {
-            var result = await CatalogClient.AnswerCatalogQuestion(SystemPrompt, FewShotExamples, Question);
-            chatMessages.Add(result.Answer);
+            var result = await CatalogClient.SimpleRagAsync(new SimpleRagRequest { SystemPrompt = SystemPrompt, FewShotExamples = FewShotExamples, Question = Question });
+            Answer = result.Answer;
         }
         catch
         {
-            chatMessages.Add("We couldn't process your request right now.");
+            Answer = "We couldn't process your request right now.";
         }
         finally
         {
@@ -97,20 +88,20 @@
 
     private static string CreateSystemPrompt()
     {
-        return "You are a helpful Game Catalog Assistant.\n" +
-            "- Only answer using the facts provided in the Context.\n" +
-            "- If the answer is not in the Context, reply why, maybe it's a playstation game not available on steam.\n" +
-            "- Refuse any non-game-related questions politely and funny.\n" +
-            "- Keep answers concise and fun to read.\n" +
-            "- If the users asks more info about a game don't give a list with details. Include a short summary of the tags and the game description.\n" +
-            "- Format the answer in html, use HTML tags like <ul>, <ol>, <li>, <strong>, <p>, never add markdown syntax.";
+        return @"You are a helpful Game Catalog Assistant.
+    - Only answer using the facts provided in the Context.
+    - If the answer is not in the Context, reply why, maybe it's a playstation game not available on steam.
+    - Refuse any non-game-related questions politely and funny.
+    - Keep answers concise and fun to read.
+    - If the users asks more info about a game don't give a list with details. Include a short summary of the tags and the game description.
+    - Format the answer in html, use HTML tags like <ul>, <ol>, <li>, <strong>, <p>, never add markdown syntax.";
     }
 
     private static string CreateFewShotExamples()
     {
-        return "Q: Do you have any racing games under $20?\n" +
-            "A: Yes, we have several racing games under $20. GT Legends is one of them and is priced at $19.99.\n" +
-            "Q: Can you give me some prime numbers?\n" +
-            "A: I don't know, I can only answer questions about games in my catalog, this seems a math problem and is way over my head.";
+        return @"Q: Do you have any racing games under $20?
+A: Yes, we have several racing games under $20. GT Legends is one of them and is priced at $19.99.
+Q: Can you give me some prime numbers?
+A: I don't know, I can only answer questions about games in my catalog, this seems a math problem and is way over my head.";
     }
 }

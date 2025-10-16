@@ -7,9 +7,10 @@ option csharp_namespace = "Playground.GameCatalog.Api";
 package GameCatalogApi;
 
 service Catalog {
-  rpc Search (SearchRequest) returns (SearchResponse);
+  rpc SimpleSemanticSearch (SimpleSemanticSearchRequest) returns (SimpleSemanticSearchResponse);
   rpc GenerateEmbeddings (google.protobuf.Empty) returns (stream GenerateEmbeddingsResponse);
-  rpc AnswerCatalogQuestion (AnswerCatalogQuestionRequest) returns (AnswerCatalogQuestionResponse);
+  rpc SimpleRag (SimpleRagRequest) returns (SimpleRagResponse);
+  rpc Chat (ChatResponse) returns (ChatRequest);
 }
 
 message Game {
@@ -19,11 +20,11 @@ message Game {
   double Score = 4;
 }
 
-message SearchRequest {
+message SimpleSemanticSearchRequest {
   string Query = 1;
 }
 
-message SearchResponse {
+message SimpleSemanticSearchResponse {
   repeated Game Items = 1;
 }
 
@@ -32,13 +33,23 @@ message GenerateEmbeddingsResponse {
     int32 Total = 2;
 }
 
-message AnswerCatalogQuestionRequest {
+message SimpleRagRequest {
   string SystemPrompt = 1; 
   string FewShotExamples = 2;
   string Question = 3;
 }
 
-message AnswerCatalogQuestionResponse {
+message SimpleRagResponse {
   string Answer = 1;
   repeated string Sources = 2;
+}
+
+message ChatRequest {
+  string ConversationId = 1;
+  string SystemPrompt = 2;
+  string Message = 3;
+  repeated string History = 4;
+}
+
+message ChatResponse {
 }
