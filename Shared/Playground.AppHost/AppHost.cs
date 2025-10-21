@@ -3,7 +3,8 @@ var builder = DistributedApplication.CreateBuilder(args);
 var parameter = builder.AddParameter("openai-api-key");
 
 var sqlServer = builder.AddSqlServer("Playground", port: 40783)
-                    .WithVolume(target: "/var/opt/mssql");
+                    .WithVolume(name: "playground-mssql-data", target: "/var/opt/mssql")
+                    .WithLifetime(ContainerLifetime.Persistent);
 
 var gameCatalogDb = sqlServer.AddDatabase("gameCatalogDb", "GameCatalog");
 

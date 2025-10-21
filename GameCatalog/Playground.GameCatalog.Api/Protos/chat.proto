@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "Playground.GameCatalog.Api";
+
+package GameChatApi;
+
+service Chat {
+  rpc GetResponse (GetResponseRequest) returns (GetResponseResponse);
+}
+
+message Message {
+  string role = 1;
+  string content = 2;
+}
+
+message GetResponseRequest {
+  repeated Message Messages = 1;
+}
+
+message GetResponseResponse {
+  Message Message = 1;
+}

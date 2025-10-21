@@ -21,4 +21,11 @@
     <ProjectReference Include="..\..\GameCatalog\Playground.GameCatalog.Web\Playground.GameCatalog.Web.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot/lib/dompurify/" />
+    <Folder Include="wwwroot/lib/dompurify/dist/" />
+    <Folder Include="wwwroot/lib/marked/" />
+    <Folder Include="wwwroot/lib/marked/dist/" />
+  </ItemGroup>
+
 </Project>

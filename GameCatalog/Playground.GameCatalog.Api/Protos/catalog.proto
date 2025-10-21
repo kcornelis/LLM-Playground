@@ -10,7 +10,6 @@ service Catalog {
   rpc SimpleSemanticSearch (SimpleSemanticSearchRequest) returns (SimpleSemanticSearchResponse);
   rpc GenerateEmbeddings (google.protobuf.Empty) returns (stream GenerateEmbeddingsResponse);
   rpc SimpleRag (SimpleRagRequest) returns (SimpleRagResponse);
-  rpc Chat (ChatResponse) returns (ChatRequest);
 }
 
 message Game {
@@ -42,14 +41,4 @@ message SimpleRagRequest {
 message SimpleRagResponse {
   string Answer = 1;
   repeated string Sources = 2;
-}
-
-message ChatRequest {
-  string ConversationId = 1;
-  string SystemPrompt = 2;
-  string Message = 3;
-  repeated string History = 4;
-}
-
-message ChatResponse {
 }

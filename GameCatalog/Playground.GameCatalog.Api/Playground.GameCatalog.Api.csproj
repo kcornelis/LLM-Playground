@@ -9,11 +9,13 @@
 
   <ItemGroup>
     <Protobuf Include="Protos\catalog.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\chat.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.64.0" />
     <PackageReference Include="Grpc.AspNetCore.HealthChecks" Version="2.70.0" />
+    <PackageReference Include="Aspire.Azure.AI.OpenAI" Version="9.5.0-preview.1.25474.7" />
     <PackageReference Include="Microsoft.Extensions.AI" Version="9.10.0" />
     <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.10.0-preview.1.25513.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0-rc.1.25451.107" />

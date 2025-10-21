@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <Protobuf Include="..\Playground.GameCatalog.Api\Protos\catalog.proto" GrpcServices="Client" Link="Protos\catalog.proto" />
+    <Protobuf Include="..\Playground.GameCatalog.Api\Protos\chat.proto" GrpcServices="Client" Link="Protos\chat.proto" />
   </ItemGroup>
 
   <ItemGroup>
