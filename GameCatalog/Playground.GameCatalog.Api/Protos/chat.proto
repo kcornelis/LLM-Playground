@@ -8,6 +8,7 @@ package GameChatApi;
 
 service Chat {
   rpc GetResponse (GetResponseRequest) returns (GetResponseResponse);
+  rpc GetStreamingResponse (GetResponseRequest) returns (stream GetResponseResponse);
 }
 
 message Message {

@@ -88,9 +88,15 @@
             var request = new GetResponseRequest();
             request.Messages.AddRange(messages);
 
-            var result = await ChatClient.GetResponseAsync(request);
+            var message = new Message { Role = "assistant", Content = "" };
+            messages.Add(message);
 
-            messages.Add(result.Message);
+            using var call = ChatClient.GetStreamingResponse(request);
+            await foreach (var m in call.ResponseStream.ReadAllAsync())
+            {
+                message.Content += m.Message.Content;
+                StateHasChanged();
+            }
         }
         catch
         {
@@ -102,19 +108,32 @@
         }
     }
 
+    // game link does not exist, this is just to test markdown rendering
     private static string CreateSystemPrompt()
     {
         return @"You are a helpful game catalog assistant.
 Do not answer questions about anything else.
+Keep the response descriptive, don't just return a list with specifications.
+Don't add game characteristics by default, just when asked.
 Use only simple markdown to format your responses.
 
-Use the search tool to find relevant games. 
-The search tool can include unrelated results if nothing is found, only add relevant games in your response.
-The search tool accepts a search phrase that does a semantic search over the game catalog. 
-The embedding contains the title, description, tags, platforms and popularity. Include these in the search phrase as needed.
+If you add a game to the response, format it as a markdown link with the following syntax: [{title}](/games/{id}).
+   - replace {title} with the game title and {id} with the game id
+   - keep the url relative
 
-The current year is 2025, recent games are from 2024 and 2025, older games are from before 2020, retro games are from before 2000.
-Expensive games are above $60, cheap games are below $20, free games are $0.
+Use the search tool to find relevant games
+   - can include unrelated results, only add relevant games in your response
+   - accepts a search phrase that does a semantic search over the game catalog
+   - the embedding used for the semantic search contains the title, description, tags, platforms and popularity 
+
+Here is some information about the game catalog to help you:
+   - the current year is 2023
+   - recent games are from 2023 and 2021
+   - older games are from before 2020
+   - retro games are from before 2000
+   - expensive games are above $60
+   - cheap games are below $20
+   - free games are $0
 ";
     }
 }

@@ -30,6 +30,26 @@ public class ChatService(ILogger<ChatService> _logger, GameCatalogContext _db, I
         return response;
     }
 
+    public override async Task GetStreamingResponse(GetResponseRequest request, IServerStreamWriter<GetResponseResponse> responseStream, ServerCallContext context)
+    {
+        var chatOptions = new ChatOptions
+        {
+            Tools = [AIFunctionFactory.Create(SearchAsync)]
+        };
+
+        await foreach (var update in _chatClient.GetStreamingResponseAsync(request.Messages.Select(m => new ChatMessage(new ChatRole(m.Role), m.Content)), chatOptions))
+        {
+            await responseStream.WriteAsync(new GetResponseResponse
+            {
+                Message = new Message
+                {
+                    Role = ChatRole.Assistant.ToString(),
+                    Content = update.Text ?? string.Empty
+                }
+            });
+        }
+    }
+
     [Description("Searches for games using a search phrase or specific characteristics")]
     private async Task<IEnumerable<string>> SearchAsync(
         [Description("The phrase to search for.")] string searchPhrase,
@@ -64,14 +84,15 @@ public class ChatService(ILogger<ChatService> _logger, GameCatalogContext _db, I
             .Take(20)
             .ToListAsync();
 
-        return [.. games.Select(g => $@"Title: {g.Title}
+        return [.. games.Select(g => $@"Id: {g.Id}
+Title: {g.Title}
 Release date: {(g.ReleaseDate.HasValue ? g.ReleaseDate.Value.Year : "Unknown release date")}
 Tags: {string.Join(", ", g.Tags ?? [])}
 Description: {(!string.IsNullOrWhiteSpace(g.Description) ? g.Description : "No description available.")}
 Platforms: {string.Join(", ", g.AvailablePlatforms)}
 Rating: {(!string.IsNullOrWhiteSpace(g.Rating) ? "Rated " + g.Rating.ToLowerInvariant() : "Rating unknown")}
 Reviews: {(g.Reviews > 0 ? g.Reviews + " reviews and a positive ratio of " + g.PositiveRatio + "%" : "No reviews available")}
-Price: {(g.Price.HasValue ? (g.Price >= g.OriginalPrice ? g.Price : "Discounted from " + g.OriginalPrice + " to " + g.Price + " (" + g.Discount + "% discount)") : string.Empty)}"
+Price: {(g.Price.HasValue ? (g.Price >= g.OriginalPrice ? g.Price : "Discounted from " + g.OriginalPrice + " to " + g.Price + " (" + g.Discount + "% discount)") : "No price available")}"
             )];
     }
 }
